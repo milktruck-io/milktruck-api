@@ -1,0 +1,16 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# encrypted_password has to be a real bcrypt hash, so it is generated the same
+# way Devise generates it on save (at Devise.stretches, which is 1 in test).
+
+one:
+  name: Ada Lovelace
+  username: ada
+  email: ada@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
+
+two:
+  name: Grace Hopper
+  username: grace
+  email: grace@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, "password") %>
