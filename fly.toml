@@ -1,0 +1,44 @@
+# fly.toml app configuration file for milktruck-api
+# See https://fly.io/docs/reference/configuration/
+
+app = "milktruck-api"
+primary_region = "iad"
+console_command = "/rails/bin/rails console"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  RAILS_ENV = "production"
+  # Run Solid Queue inside Puma (single-server setup, mirrors config/deploy.yml)
+  SOLID_QUEUE_IN_PUMA = "true"
+  # Thruster listens on HTTP_PORT (default 80) and proxies to Puma on 3000
+  HTTP_PORT = "80"
+
+# SQLite databases (primary, cache, queue, cable) and Active Storage files live
+# in /rails/storage, so they need a persistent volume. Create it once with:
+#   fly volumes create milktruck_storage --region iad --size 1
+[mounts]
+  source = "milktruck_storage"
+  destination = "/rails/storage"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  # SQLite on a volume means a single machine; don't let Fly scale it out.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/up"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
