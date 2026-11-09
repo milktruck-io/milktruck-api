@@ -4,6 +4,19 @@ Rails.application.routes.draw do
   # claim POST /users).
   devise_for :users, path: "auth"
 
+  # Trivia game show (temporary — one night only, see milktruck-web app/trivia).
+  # No auth beyond the hardcoded host name in TriviaGame::ADMIN_NAME.
+  scope "/trivia", module: "trivia", as: "trivia" do
+    post "join", to: "games#join"
+    get "state", to: "games#state"
+    post "answer", to: "games#answer"
+    post "advance", to: "games#advance"
+    patch "players/:id/name", to: "games#rename", as: "player_name"
+    patch "players/:id/subject", to: "games#set_subject", as: "player_subject"
+    delete "players/:id", to: "games#kick", as: "player"
+    match "*path", to: "games#preflight", via: :options
+  end
+
   resources :events
   resources :clients
   resources :users

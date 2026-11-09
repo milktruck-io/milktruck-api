@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_11_184142) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_120001) do
   create_table "clients", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -19,6 +19,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_11_184142) do
   create_table "events", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "trivia_answers", force: :cascade do |t|
+    t.integer "choice", null: false
+    t.datetime "created_at", null: false
+    t.integer "question_index", null: false
+    t.integer "trivia_player_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trivia_player_id", "question_index"], name: "index_trivia_answers_on_trivia_player_id_and_question_index", unique: true
+    t.index ["trivia_player_id"], name: "index_trivia_answers_on_trivia_player_id"
+  end
+
+  create_table "trivia_games", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "phase", default: "lobby", null: false
+    t.integer "question_index", default: -1, null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "trivia_players", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.string "subject_category"
+    t.integer "trivia_game_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trivia_game_id", "name"], name: "index_trivia_players_on_trivia_game_id_and_name", unique: true
+    t.index ["trivia_game_id"], name: "index_trivia_players_on_trivia_game_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -35,4 +62,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_11_184142) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
+
+  add_foreign_key "trivia_answers", "trivia_players"
+  add_foreign_key "trivia_players", "trivia_games"
 end
